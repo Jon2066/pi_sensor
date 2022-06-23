@@ -11,7 +11,20 @@ class MethodChannelTempHumSensor extends TempHumSensorPlatform {
 
   @override
   Future<String?> getPlatformVersion() async {
-    final version = await methodChannel.invokeMethod<String>('getPlatformVersion');
+    final version =
+        await methodChannel.invokeMethod<String>('getPlatformVersion');
     return version;
+  }
+
+  @override
+  Future<int?> setupSensor() async {
+    final status = await methodChannel.invokeMethod<int>('setup');
+    return status;
+  }
+
+  @override
+  Future<String?> read() async {
+    final value = await methodChannel.invokeMethod<String>('read');
+    return value;
   }
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pi_sensor/sensor_list.dart';
 
 void main() {
   runApp(const MyApp());
@@ -102,6 +103,24 @@ class _MyHomePageState extends State<MyHomePage> {
               '$_counter',
               style: Theme.of(context).textTheme.headline4,
             ),
+            Container(
+                margin: const EdgeInsets.only(top: 40),
+                width: 100,
+                height: 44,
+                color: Colors.orange,
+                alignment: Alignment.center,
+                child: InkWell(
+                  child: const Text(
+                    "demos",
+                    style: TextStyle(fontSize: 17),
+                  ),
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const SensorListWidget()));
+                  },
+                )),
           ],
         ),
       ),

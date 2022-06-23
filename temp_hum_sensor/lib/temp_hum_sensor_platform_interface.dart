@@ -26,4 +26,12 @@ abstract class TempHumSensorPlatform extends PlatformInterface {
   Future<String?> getPlatformVersion() {
     throw UnimplementedError('platformVersion() has not been implemented.');
   }
+
+  Future<int?> setupSensor() {
+    throw UnimplementedError('setupSensor() has not been implemented.');
+  }
+
+  Future<String?> read() {
+    throw UnimplementedError('read() has not been implemented.');
+  }
 }
