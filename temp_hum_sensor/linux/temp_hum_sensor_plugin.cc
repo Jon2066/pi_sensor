@@ -63,7 +63,7 @@ static void temp_hum_sensor_plugin_handle_method_call(
     pinMode(TEMP_HUM_GPIO, OUTPUT);
     digitalWrite(TEMP_HUM_GPIO, 1);
     sleep(1);
-    pindMode(TEMP_HUM_GPIO, OUTPU);
+    pinMode(TEMP_HUM_GPIO, OUTPUT);
     digitalWrite(TEMP_HUM_GPIO, 0);
     delay(25);
     digitalWrite(TEMP_HUM_GPIO, 1);
@@ -71,7 +71,7 @@ static void temp_hum_sensor_plugin_handle_method_call(
     pullUpDnControl(TEMP_HUM_GPIO, PUD_UP);
     delayMicroseconds(27);
     unsigned long databuf = 0;
-    while (!digitalRead(TEMP_HUM_GPIO))
+    while (digitalRead(TEMP_HUM_GPIO) == 0)
     {
       for (int i = 0; i < 32; i++)
       {
@@ -84,10 +84,12 @@ static void temp_hum_sensor_plugin_handle_method_call(
               databuf++;
             }
             databuf = databuf << 1;
+            break;
           }
+          break;
         }
-        
       }
+      break;
     }
     g_autofree gchar *value = g_strdup_printf("%ld",databuf);
     g_autoptr(FlValue) result = fl_value_new_string(value);
