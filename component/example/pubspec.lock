@@ -39,7 +39,7 @@ packages:
   component:
     dependency: "direct main"
     description:
-      path: "../component"
+      path: ".."
       relative: true
     source: path
     version: "0.0.1"
@@ -149,13 +149,6 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "1.1.1"
-  temp_hum_sensor:
-    dependency: "direct main"
-    description:
-      path: "../temp_hum_sensor"
-      relative: true
-    source: path
-    version: "0.0.1"
   term_glyph:
     dependency: transitive
     description:

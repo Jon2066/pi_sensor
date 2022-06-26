@@ -4,7 +4,6 @@
 
 list(APPEND FLUTTER_PLUGIN_LIST
   component
-  temp_hum_sensor
 )
 
 list(APPEND FLUTTER_FFI_PLUGIN_LIST
