@@ -13,7 +13,6 @@ class TempSensorWidget extends StatefulWidget {
 }
 
 class _TempSensorWidget extends State<TempSensorWidget> {
-  
   String temp = "";
   Timer? detectTimer;
   bool running = false;
@@ -32,17 +31,31 @@ class _TempSensorWidget extends State<TempSensorWidget> {
         body: Stack(
           alignment: Alignment.center,
           children: [
-           const Positioned(
+            const Positioned(
               top: 50.0,
               left: 0.0,
               right: 0.0,
-         child:Text("温湿度传感器", textAlign: TextAlign.center,style: TextStyle(fontSize: 17),),
+              child: Text(
+                "温湿度传感器",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 17,
+                  fontFamily: 'NotoSerif',
+                ),
+              ),
             ),
             Positioned(
               top: 80,
               left: 0,
               right: 0,
-              child: Text("温度湿度: $temp",textAlign: TextAlign.center,style:const TextStyle(fontSize: 17),),
+              child: Text(
+                "温度湿度: $temp",
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 17,
+                  fontFamily: 'NotoSerif',
+                ),
+              ),
             ),
             Positioned(
               top: 120,
@@ -52,9 +65,16 @@ class _TempSensorWidget extends State<TempSensorWidget> {
                 child: Container(
                   alignment: Alignment.center,
                   color: Colors.orange,
-                  child:const Text("开始检测", textAlign: TextAlign.center,style: TextStyle(fontSize: 17),),
+                  child: const Text(
+                    "开始检测",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 17,
+                      fontFamily: 'NotoSerif',
+                    ),
+                  ),
                 ),
-                onTap: (){
+                onTap: () {
                   detectAction();
                 },
               ),
@@ -63,18 +83,17 @@ class _TempSensorWidget extends State<TempSensorWidget> {
         ));
   }
 
-  void detectAction(){
-    if(running){
+  void detectAction() {
+    if (running) {
       running = false;
       detectTimer?.cancel();
       detectTimer = null;
-    }
-    else{
+    } else {
       running = true;
       detectTimer = Timer.periodic(const Duration(seconds: 3), (timer) {
-        sensor.read().then((value){
-          print(value);
-          int v = int.parse(value??"0");
+        sensor.read().then((value) {
+          debugPrint(value);
+          int v = int.parse(value ?? "0");
           double hum = ((v >> 24) & 0xff).toDouble() + ((v >> 16) & 0xff) / 100;
           double tmp = ((v >> 8) & 0xff) + (v & 0xff) / 100;
           temp = "${tmp.toStringAsFixed(2)}, ${hum.toStringAsFixed(2)}";

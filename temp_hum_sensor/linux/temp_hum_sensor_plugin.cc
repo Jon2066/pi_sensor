@@ -25,6 +25,47 @@ struct _TempHumSensorPlugin
 
 G_DEFINE_TYPE(TempHumSensorPlugin, temp_hum_sensor_plugin, g_object_get_type())
 
+
+static void DHT_setGPIO(){
+  pinMode(TEMP_HUM_GPIO, OUTPUT);
+  digitalWrite(TEMP_HUM_GPIO, 1);
+  delay(100);
+  digitalWrite(TEMP_HUM_GPIO, 0);
+  delay(25);
+  digitalWrite(TEMP_HUM_GPIO, 1);
+  pinMode(TEMP_HUM_GPIO, INPUT);
+}
+
+static int DHT_check(){
+  while (digitalRead(TEMP_HUM_GPIO) == 0)
+  {
+    continue;
+  }
+  while (digitalRead(TEMP_HUM_GPIO) == 1)
+  {
+    continue;
+  }
+  return 1;
+}
+
+
+static int DHT_readBit(){
+  int k = 0;
+  while (digitalRead(TEMP_HUM_GPIO) == 0)
+  {
+    continue;
+  }
+  while (digitalRead(TEMP_HUM_GPIO) == 1)
+  {
+    k += 1;
+    continue;
+  }
+  if(k > 20){
+    return 1;
+  }
+  return 0;
+}
+
 // Called when a method call is received from Flutter.
 static void temp_hum_sensor_plugin_handle_method_call(
     TempHumSensorPlugin *self,
@@ -60,41 +101,23 @@ static void temp_hum_sensor_plugin_handle_method_call(
   }
   else if (strcmp(method, "read") == 0)
   {
-    pinMode(TEMP_HUM_GPIO, OUTPUT);
-    digitalWrite(TEMP_HUM_GPIO, 1);
-    sleep(1);
-    pinMode(TEMP_HUM_GPIO, OUTPUT);
-    digitalWrite(TEMP_HUM_GPIO, 0);
-    delay(25);
-    digitalWrite(TEMP_HUM_GPIO, 1);
-    pinMode(TEMP_HUM_GPIO, INPUT);
-    pullUpDnControl(TEMP_HUM_GPIO, PUD_UP);
-    delayMicroseconds(27);
-    unsigned long databuf = 0;
-    while (digitalRead(TEMP_HUM_GPIO) == 0)
-    {
+    DHT_setGPIO();
+    if(DHT_check()){
+      unsigned int data = 0;
+      unsigned int check = 0;
       for (int i = 0; i < 32; i++)
       {
-        while (digitalRead(TEMP_HUM_GPIO))
-        {
-          while (!digitalRead(TEMP_HUM_GPIO))
-          {
-            delayMicroseconds(32);
-            if(digitalRead(TEMP_HUM_GPIO) == 1){
-              databuf++;
-            }
-            databuf = databuf << 1;
-            break;
-          }
-          break;
-        }
+        data += DHT_readBit();
+        data = data << 1;
       }
-      break;
+      for(int i = 0; i < 8; i++){
+        check += DHT_readBit();
+        check = check << 1;
+      }
+      g_autofree gchar *value = g_strdup_printf("%ld",databuf);
+      g_autoptr(FlValue) result = fl_value_new_string(value);
+      response = FL_METHOD_RESPONSE(fl_method_success_response_new(result));
     }
-    g_autofree gchar *value = g_strdup_printf("%ld",databuf);
-    g_autoptr(FlValue) result = fl_value_new_string(value);
-
-    response = FL_METHOD_RESPONSE(fl_method_success_response_new(result));
   }
   else
   {

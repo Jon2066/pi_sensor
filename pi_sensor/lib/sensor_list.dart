@@ -35,7 +35,10 @@ class _SensorListWidget extends State<SensorListWidget> {
                       child: Text(
                         sensors[index],
                         textAlign: TextAlign.center,
-                        style: const TextStyle(fontSize: 17),
+                        style: const TextStyle(
+                          fontSize: 17,
+                          fontFamily: 'NotoSerif',
+                        ),
                       ),
                       onTap: () {
                         handleSelect(index);

@@ -41,7 +41,7 @@ class _RGBLEDWidget extends State<RGBLEDWidget> {
                     height: 50,
                     child: TextField(
                       decoration: const InputDecoration(
-                          hintText: "rgb byte三位 111 输入7",
+                          hintText: "rgb FFFFFF",
                           border: InputBorder.none),
                       onChanged: (text) {
                         rgb = int.parse(text);
