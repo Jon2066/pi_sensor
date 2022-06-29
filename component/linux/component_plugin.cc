@@ -58,7 +58,7 @@ static void component_plugin_handle_method_call(
     }
   }
   else if (strcmp(method, "setRGBLED") == 0) {
-
+    auto *args = fl_method_call_get_args(method_call);
     unsigned int rgb = fl_value_get_int(fl_value_lookup_string(args, "rgb"));
     unsigned char r = (rgb >> 2) & 0xff;
     unsigned char g = (rgb >> 1) & 0xff;

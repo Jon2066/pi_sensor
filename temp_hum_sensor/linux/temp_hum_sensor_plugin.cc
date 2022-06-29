@@ -107,14 +107,12 @@ static void temp_hum_sensor_plugin_handle_method_call(
       unsigned int check = 0;
       for (int i = 0; i < 32; i++)
       {
-        data += DHT_readBit();
-        data = data << 1;
+        data += DHT_readBit() << (31 - i);
       }
       for(int i = 0; i < 8; i++){
-        check += DHT_readBit();
-        check = check << 1;
+        check += DHT_readBit() << (7 - i);
       }
-      g_autofree gchar *value = g_strdup_printf("%ld",databuf);
+      g_autofree gchar *value = g_strdup_printf("%ld",data);
       g_autoptr(FlValue) result = fl_value_new_string(value);
       response = FL_METHOD_RESPONSE(fl_method_success_response_new(result));
     }
