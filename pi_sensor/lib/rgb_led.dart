@@ -1,5 +1,10 @@
+import 'dart:async';
+import 'dart:math';
+import 'dart:typed_data';
+
 import 'package:component/component.dart';
 import 'package:flutter/material.dart';
+import 'package:pi_sensor/hex_utils.dart';
 
 class RGBLEDWidget extends StatefulWidget {
   const RGBLEDWidget({Key? key}) : super(key: key);
@@ -10,8 +15,13 @@ class RGBLEDWidget extends StatefulWidget {
 }
 
 class _RGBLEDWidget extends State<RGBLEDWidget> {
-  int rgb = 0;
+
+  static const String hexRegex = "[^0-9a-fA-F]";
+
+  String rgbStr = "FFFFFF";
   Component component = Component();
+  bool running = false;
+  Timer? runningTimer;
 
   @override
   void initState() {
@@ -41,10 +51,10 @@ class _RGBLEDWidget extends State<RGBLEDWidget> {
                     height: 50,
                     child: TextField(
                       decoration: const InputDecoration(
-                          hintText: "rgb FFFFFF",
+                          hintText: "rgb like FFFFFF",
                           border: InputBorder.none),
                       onChanged: (text) {
-                        rgb = int.parse(text);
+                        rgbStr = text;
                       },
                     ))),
             Positioned(
@@ -52,7 +62,7 @@ class _RGBLEDWidget extends State<RGBLEDWidget> {
               left: 100,
               child: InkWell(
                 child: Container(
-                  width: 80,
+                  width: 120,
                   height: 44,
                   color: Colors.orange,
                   alignment: Alignment.center,
@@ -62,13 +72,62 @@ class _RGBLEDWidget extends State<RGBLEDWidget> {
                   ),
                 ),
                 onTap: () {
-                  component.setRGBLED(rgb);
+                  if(RegExp(hexRegex).hasMatch(rgbStr)){
+                    Uint8List dataList = HexUtils.toUnitList(rgbStr);
+                    setRGBHex(dataList);
+                  }
                 },
               ),
-            )
+            ),
+            Positioned(
+              top: 240,
+              left: 100,
+              child: InkWell(
+                child: Container(
+                  width: 120,
+                  height: 44,
+                  color: Colors.orange,
+                  alignment: Alignment.center,
+                  child: Text(
+                    running ? "random stop" : "random start",
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+                onTap: () {
+                  randomAction();
+                },
+              ),
+            ),
           ],
         ),
       ),
     );
+  }
+
+  void setRGBHex(Uint8List dataList) {
+    int value = 0;
+    for (int v in dataList) {
+      value += v;
+      value = value << 8;
+    }
+    value = (value >> 8) & 0xffffff;
+    component.setRGBLED(value);
+  }
+
+  void randomAction() {
+    if (running) {
+      running = false;
+      runningTimer?.cancel();
+    } else {
+      running = true;
+      runningTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+        Random random = Random();
+        int r = random.nextInt(256);
+        int g = random.nextInt(256);
+        int b = random.nextInt(256);
+        setRGBHex(Uint8List.fromList([r, g, b]));
+      });
+    }
+    setState(() {});
   }
 }

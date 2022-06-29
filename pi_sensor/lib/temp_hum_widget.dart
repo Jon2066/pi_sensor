@@ -65,10 +65,10 @@ class _TempSensorWidget extends State<TempSensorWidget> {
                 child: Container(
                   alignment: Alignment.center,
                   color: Colors.orange,
-                  child: const Text(
-                    "开始检测",
+                  child: Text(
+                    running ? "stop" : "start",
                     textAlign: TextAlign.center,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 17,
                       fontFamily: 'NotoSerif',
                     ),
@@ -94,11 +94,12 @@ class _TempSensorWidget extends State<TempSensorWidget> {
         sensor.read().then((value) {
           debugPrint(value);
           int v = int.parse(value ?? "0");
-          double hum = ((v >> 24) & 0xff).toDouble() + ((v >> 16) & 0xff) / 100;
-          double tmp = ((v >> 8) & 0xff) + (v & 0xff) / 100;
+          int hum = (v >> 24) & 0xff;  //只看整数部分， (v >> 16) & 0xff小数部分忽略 
+          int tmp = (v >> 8) & 0xff;
           temp = "${tmp.toStringAsFixed(2)}, ${hum.toStringAsFixed(2)}";
         });
       });
     }
+    setState(() {});
   }
 }
