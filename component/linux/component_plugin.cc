@@ -11,6 +11,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <wiringPi.h>
+#include <softPwm.h>
 
 #define RGB_R_GPIO 27
 #define RGB_G_GPIO 28
@@ -52,6 +53,10 @@ static void component_plugin_handle_method_call(
     }
     else
     {
+	    softPwmCreate(RGB_R_GPIO,  0, 100);
+	    softPwmCreate(RGB_G_GPIO,  0, 100);
+	    softPwmCreate(RGB_B_GPIO,  0, 100);
+
       g_autoptr(FlValue) result = fl_value_new_int(0);
 
       response = FL_METHOD_RESPONSE(fl_method_success_response_new(result));
@@ -60,15 +65,12 @@ static void component_plugin_handle_method_call(
   else if (strcmp(method, "setRGBLED") == 0) {
     auto *args = fl_method_call_get_args(method_call);
     unsigned int rgb = fl_value_get_int(fl_value_lookup_string(args, "rgb"));
-    unsigned char r = (rgb >> 2) & 0xff;
-    unsigned char g = (rgb >> 1) & 0xff;
+    unsigned char r = (rgb >> 24) & 0xff;
+    unsigned char g = (rgb >> 16) & 0xff;
     unsigned char b = rgb & 0xff;
-    pinMode(RGB_R_GPIO, OUTPUT);
-    digitalWrite(RGB_R_GPIO, r);
-    pinMode(RGB_G_GPIO, OUTPUT);
-    digitalWrite(RGB_G_GPIO, g);
-    pinMode(RGB_B_GPIO, OUTPUT);
-    digitalWrite(RGB_B_GPIO, b);
+    softPwmWrite(RGB_R_GPIO, (int)(100 * r / 255.0));
+    softPwmWrite(RGB_G_GPIO, (int)(100 * g / 255.0));
+    softPwmWrite(RGB_B_GPIO, (int)(100 * b / 255.0));
   }
    else {
     response = FL_METHOD_RESPONSE(fl_method_not_implemented_response_new());
