@@ -90,11 +90,11 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
-fonts:
-  - family: NotoSerif
-    fonts:
-      - asset: assets/fonts/SourceHanSansCN-Light.ttf
+  assets:
+    - fonts/
+  fonts:
+    - family: NotoSerif
+      fonts:
+        - asset: fonts/SourceHanSerifCN-Light.ttf
 
-assets:
-  - fonts/
 
