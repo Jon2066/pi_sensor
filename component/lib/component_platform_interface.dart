@@ -30,9 +30,12 @@ abstract class ComponentPlatform extends PlatformInterface {
   Future<int?> setup() {
     throw UnimplementedError('setup() has not been implemented.');
   }
-  
+
   Future<int?> setRGBLED(int rgb) {
     throw UnimplementedError('setRGBLED() has not been implemented.');
   }
 
+  Future<int?> reset() async {
+    throw UnimplementedError('reset() has not been implemented.');
+  }
 }

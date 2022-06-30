@@ -16,7 +16,7 @@ class RGBLEDWidget extends StatefulWidget {
 
 class _RGBLEDWidget extends State<RGBLEDWidget> {
 
-  static const String hexRegex = "[^0-9a-fA-F]";
+  static const String hexRegex = "^[A-Fa-f0-9]{6}";
 
   String rgbStr = "FFFFFF";
   Component component = Component();
@@ -80,6 +80,25 @@ class _RGBLEDWidget extends State<RGBLEDWidget> {
               ),
             ),
             Positioned(
+              top: 160,
+              left: 300,
+              child: InkWell(
+                child: Container(
+                  width: 120,
+                  height: 44,
+                  color: Colors.orange,
+                  alignment: Alignment.center,
+                  child: const Text(
+                    "reset",
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+                onTap: () {
+                  reset();
+                },
+              ),
+            ),
+            Positioned(
               top: 240,
               left: 100,
               child: InkWell(
@@ -129,5 +148,14 @@ class _RGBLEDWidget extends State<RGBLEDWidget> {
       });
     }
     setState(() {});
+  }
+
+  void reset(){
+    component.reset();
+  }
+
+  @override
+  void dispose() {
+    reset();
   }
 }

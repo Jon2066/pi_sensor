@@ -63,14 +63,22 @@ static void component_plugin_handle_method_call(
     }
   }
   else if (strcmp(method, "setRGBLED") == 0) {
-
+    auto *args = fl_method_call_get_args(method_call);
     unsigned int rgb = fl_value_get_int(fl_value_lookup_string(args, "rgb"));
-    unsigned char r = (rgb >> 24) & 0xff;
-    unsigned char g = (rgb >> 16) & 0xff;
+    unsigned char r = (rgb >> 16) & 0xff;
+    unsigned char g = (rgb >> 8) & 0xff;
     unsigned char b = rgb & 0xff;
     softPwmWrite(RGB_R_GPIO, (int)(100 * r / 255.0));
     softPwmWrite(RGB_G_GPIO, (int)(100 * g / 255.0));
     softPwmWrite(RGB_B_GPIO, (int)(100 * b / 255.0));
+  }
+  else if(strcmp(method, "reset") == 0)){
+  	 softPwmCreate(RGB_R_GPIO,  0, 100);
+  	 softPwmCreate(RGB_G_GPIO,  0, 100);
+  	 softPwmCreate(RGB_B_GPIO,  0, 100);
+
+  	 g_autoptr(FlValue) result = fl_value_new_int(0);
+     response = FL_METHOD_RESPONSE(fl_method_success_response_new(result));
   }
    else {
     response = FL_METHOD_RESPONSE(fl_method_not_implemented_response_new());

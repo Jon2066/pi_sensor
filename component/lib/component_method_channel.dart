@@ -27,5 +27,11 @@ class MethodChannelComponent extends ComponentPlatform {
     final status = await methodChannel.invokeMethod<int>('setRGBLED', {"rgb":rgb});
     return status;
   }
+
+  @override
+  Future<int?> reset() async {
+    final status = await methodChannel.invokeMethod<int>('reset');
+    return status;
+  }
   
 }

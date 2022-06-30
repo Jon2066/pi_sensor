@@ -13,4 +13,8 @@ class Component {
   Future<int?> setup() {
     return ComponentPlatform.instance.setup();
   }
+
+  Future<int?> reset() async {
+    return ComponentPlatform.instance.reset();
+  }
 }
