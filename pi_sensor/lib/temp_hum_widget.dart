@@ -13,7 +13,8 @@ class TempSensorWidget extends StatefulWidget {
 }
 
 class _TempSensorWidget extends State<TempSensorWidget> {
-  String temp = "";
+  String tempString = ""; //温度
+  String humString = ""; //湿度
   Timer? detectTimer;
   bool running = false;
   TempHumSensor sensor = TempHumSensor();
@@ -45,11 +46,11 @@ class _TempSensorWidget extends State<TempSensorWidget> {
               ),
             ),
             Positioned(
-              top: 80,
+              top: 110,
               left: 0,
               right: 0,
               child: Text(
-                "温度湿度: $temp",
+                "温度: $tempString",
                 textAlign: TextAlign.center,
                 style: const TextStyle(
                   fontSize: 17,
@@ -58,7 +59,20 @@ class _TempSensorWidget extends State<TempSensorWidget> {
               ),
             ),
             Positioned(
-              top: 120,
+              top: 150,
+              left: 0,
+              right: 0,
+              child: Text(
+                "湿度: $humString",
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 17,
+                  fontFamily: 'NotoSerif',
+                ),
+              ),
+            ),
+            Positioned(
+              top: 260,
               width: 100,
               height: 44,
               child: InkWell(
@@ -94,9 +108,10 @@ class _TempSensorWidget extends State<TempSensorWidget> {
         sensor.read().then((value) {
           debugPrint(value);
           int v = int.parse(value ?? "0");
-          int hum = (v >> 24) & 0xff;  //只看整数部分， (v >> 16) & 0xff小数部分忽略 
-          int tmp = (v >> 8) & 0xff;
-          temp = "${tmp.toStringAsFixed(2)}, ${hum.toStringAsFixed(2)}";
+          int hum = (v >> 24) & 0xff; //只看整数部分， (v >> 16) & 0xff小数部分忽略
+          int temp = (v >> 8) & 0xff;
+          tempString = "${temp.toStringAsFixed(2)} °C";
+          humString = "${hum.toStringAsFixed(2)} %";
         });
       });
     }
