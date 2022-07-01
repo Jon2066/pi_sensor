@@ -25,8 +25,8 @@ struct _TempHumSensorPlugin
 
 G_DEFINE_TYPE(TempHumSensorPlugin, temp_hum_sensor_plugin, g_object_get_type())
 
-
-static void DHT_setGPIO(){
+static void DHT_setGPIO()
+{
   pinMode(TEMP_HUM_GPIO, OUTPUT);
   digitalWrite(TEMP_HUM_GPIO, 1);
   delay(1000);
@@ -36,7 +36,8 @@ static void DHT_setGPIO(){
   pinMode(TEMP_HUM_GPIO, INPUT);
 }
 
-static int DHT_check(){
+static int DHT_check()
+{
   while (digitalRead(TEMP_HUM_GPIO) == 0)
   {
     continue;
@@ -48,8 +49,8 @@ static int DHT_check(){
   return 1;
 }
 
-
-static unsigned long DHT_readBit(){
+static unsigned long DHT_readBit()
+{
   int k = 0;
   while (digitalRead(TEMP_HUM_GPIO) == 0)
   {
@@ -58,9 +59,13 @@ static unsigned long DHT_readBit(){
   while (digitalRead(TEMP_HUM_GPIO) == 1)
   {
     k += 1;
+    if (k > 80)
+    {
+      return 1;
+    }
     continue;
   }
-  if(k > 80){
+  if(k >= 8){
     return 1;
   }
   return 0;
@@ -102,27 +107,31 @@ static void temp_hum_sensor_plugin_handle_method_call(
   else if (strcmp(method, "read") == 0)
   {
     DHT_setGPIO();
-    if(DHT_check()){
+    if (DHT_check())
+    {
       unsigned long data = 0;
       unsigned int check = 0;
       for (int i = 0; i < 32; i++)
       {
         data += DHT_readBit() << (31 - i);
       }
-      for(int i = 0; i < 8; i++){
+      for (int i = 0; i < 8; i++)
+      {
         check += DHT_readBit() << (7 - i);
       }
-      if(check == (data >> 24) & 0xff + (data >> 16) & 0xff + (data >> 8) & 0xff + data & 0xff){
-        g_autofree gchar *value = g_strdup_printf("%lu",data);
+      unsigned int dataCheck = ((data >> 24) & 0xff + (data >> 16) & 0xff + (data >> 8) & 0xff + data & 0xff) & 0xff;
+      if (check == dataCheck)
+      {
+        g_autofree gchar *value = g_strdup_printf("%lu", data);
         g_autoptr(FlValue) result = fl_value_new_string(value);
         response = FL_METHOD_RESPONSE(fl_method_success_response_new(result));
       }
-      else{
-        g_autofree gchar *value = g_strdup_printf("%lu",0);
+      else
+      {
+        g_autofree gchar *value = g_strdup_printf("%lu", 0);
         g_autoptr(FlValue) result = fl_value_new_string(value);
         response = FL_METHOD_RESPONSE(fl_method_success_response_new(result));
       }
-
     }
   }
   else

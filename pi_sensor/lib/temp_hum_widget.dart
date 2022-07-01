@@ -108,10 +108,14 @@ class _TempSensorWidget extends State<TempSensorWidget> {
         sensor.read().then((value) {
           debugPrint(value);
           int v = int.parse(value ?? "0");
+          if (v == 0) {
+            return;
+          }
           int hum = (v >> 24) & 0xff; //只看整数部分， (v >> 16) & 0xff小数部分忽略
           int temp = (v >> 8) & 0xff;
           tempString = "${temp.toStringAsFixed(2)} °C";
           humString = "${hum.toStringAsFixed(2)} %";
+          setState(() {});
         });
       });
     }
