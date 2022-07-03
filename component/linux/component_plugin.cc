@@ -72,7 +72,7 @@ static void component_plugin_handle_method_call(
     softPwmWrite(RGB_G_GPIO, (int)(100 * g / 255.0));
     softPwmWrite(RGB_B_GPIO, (int)(100 * b / 255.0));
   }
-  else if(strcmp(method, "reset") == 0)){
+  else if(strcmp(method, "reset") == 0){
   	 softPwmCreate(RGB_R_GPIO,  0, 100);
   	 softPwmCreate(RGB_G_GPIO,  0, 100);
   	 softPwmCreate(RGB_B_GPIO,  0, 100);

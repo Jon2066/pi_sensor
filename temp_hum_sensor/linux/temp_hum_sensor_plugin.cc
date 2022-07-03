@@ -28,21 +28,19 @@ G_DEFINE_TYPE(TempHumSensorPlugin, temp_hum_sensor_plugin, g_object_get_type())
 static void DHT_setGPIO()
 {
   pinMode(TEMP_HUM_GPIO, OUTPUT);
-  digitalWrite(TEMP_HUM_GPIO, 1);
-  delay(1000);
   digitalWrite(TEMP_HUM_GPIO, 0);
-  delay(25);
+  delay(20);
   digitalWrite(TEMP_HUM_GPIO, 1);
   pinMode(TEMP_HUM_GPIO, INPUT);
 }
 
 static int DHT_check()
 {
-  while (digitalRead(TEMP_HUM_GPIO) == 0)
+  while (!digitalRead(TEMP_HUM_GPIO))
   {
     continue;
   }
-  while (digitalRead(TEMP_HUM_GPIO) == 1)
+  while (digitalRead(TEMP_HUM_GPIO))
   {
     continue;
   }
@@ -52,11 +50,11 @@ static int DHT_check()
 static unsigned long DHT_readBit()
 {
   int k = 0;
-  while (digitalRead(TEMP_HUM_GPIO) == 0)
+  while (!digitalRead(TEMP_HUM_GPIO))
   {
     continue;
   }
-  while (digitalRead(TEMP_HUM_GPIO) == 1)
+  while (digitalRead(TEMP_HUM_GPIO))
   {
     k += 1;
     if (k > 80)
@@ -99,6 +97,9 @@ static void temp_hum_sensor_plugin_handle_method_call(
     }
     else
     {
+        pinMode(TEMP_HUM_GPIO, OUTPUT);
+        digitalWrite(TEMP_HUM_GPIO, 1);
+        delay(1000);
       g_autoptr(FlValue) result = fl_value_new_int(0);
 
       response = FL_METHOD_RESPONSE(fl_method_success_response_new(result));
@@ -128,7 +129,7 @@ static void temp_hum_sensor_plugin_handle_method_call(
       }
       else
       {
-        g_autofree gchar *value = g_strdup_printf("%lu", 0);
+        g_autofree gchar *value = g_strdup_printf("%lu", (unsigned long)0);
         g_autoptr(FlValue) result = fl_value_new_string(value);
         response = FL_METHOD_RESPONSE(fl_method_success_response_new(result));
       }
