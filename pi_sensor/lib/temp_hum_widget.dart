@@ -104,7 +104,7 @@ class _TempSensorWidget extends State<TempSensorWidget> {
       detectTimer = null;
     } else {
       running = true;
-      detectTimer = Timer.periodic(const Duration(seconds: 3), (timer) {
+      detectTimer = Timer.periodic(const Duration(seconds: 5), (timer) {
         sensor.read().then((value) {
           debugPrint(value);
           int v = int.parse(value ?? "0");

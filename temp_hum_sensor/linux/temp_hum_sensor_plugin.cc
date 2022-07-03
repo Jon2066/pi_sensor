@@ -29,13 +29,12 @@ static void DHT_setGPIO()
 {
   pinMode(TEMP_HUM_GPIO, OUTPUT);
   digitalWrite(TEMP_HUM_GPIO, 1);
-  delay(1000);
+  delay(3000);
   digitalWrite(TEMP_HUM_GPIO, 0);
-  delay(25);
+  delay(20);
   digitalWrite(TEMP_HUM_GPIO, 1);
   delayMicroseconds(35);
   pinMode(TEMP_HUM_GPIO, INPUT);
-  pullUpDnControl(TEMP_HUM_GPIO, PUD_UP);
 }
 
 static int DHT_check()
@@ -53,18 +52,20 @@ static int DHT_check()
 
 static unsigned long DHT_readBit()
 {
-  int k = 0;
-  while (digitalRead(TEMP_HUM_GPIO))
-  {
-    continue;
-  }
+
   while (!digitalRead(TEMP_HUM_GPIO))
   {
     continue;
   }
   //输出26-28us高电平 表示0，  输出70us 高电平表示1
   delayMicroseconds(32);
-  if(digitalRead(TEMP_HUM_GPIO)){
+  if (digitalRead(TEMP_HUM_GPIO))
+  {
+    //过滤掉后面的38us高电平
+    while (digitalRead(TEMP_HUM_GPIO))
+    {
+      continue;
+    }
     return 1;
   }
   return 0;
@@ -109,30 +110,30 @@ static void temp_hum_sensor_plugin_handle_method_call(
     if (DHT_check())
     {
       unsigned long data = 0;
-      unsigned int check = 0;
+      // unsigned int check = 0;
       for (int i = 0; i < 32; i++)
       {
         data *= 2; //左移1位
         data += DHT_readBit();
       }
-      for (int i = 0; i < 8; i++)
-      {
-        check *= 2;//左移1位
-        check += DHT_readBit();
-      }
-      unsigned int dataCheck = ((data >> 24) & 0xff + (data >> 16) & 0xff + (data >> 8) & 0xff + data & 0xff) & 0xff;
-      if (check == dataCheck)
-      {
+      // for (int i = 0; i < 8; i++)
+      // {
+      //   check *= 2; //左移1位
+      //   check += DHT_readBit();
+      // }
+      // unsigned int dataCheck = ((data >> 24) & 0xff + (data >> 16) & 0xff + (data >> 8) & 0xff + data & 0xff) & 0xff;
+      // if (check == dataCheck)
+      // {
         g_autofree gchar *value = g_strdup_printf("%lu", data);
         g_autoptr(FlValue) result = fl_value_new_string(value);
         response = FL_METHOD_RESPONSE(fl_method_success_response_new(result));
-      }
-      else
-      {
-        g_autofree gchar *value = g_strdup_printf("%lu", (unsigned long)0);
-        g_autoptr(FlValue) result = fl_value_new_string(value);
-        response = FL_METHOD_RESPONSE(fl_method_success_response_new(result));
-      }
+      // }
+      // else
+      // {
+      //   g_autofree gchar *value = g_strdup_printf("%lu", (unsigned long)0);
+      //   g_autoptr(FlValue) result = fl_value_new_string(value);
+      //   response = FL_METHOD_RESPONSE(fl_method_success_response_new(result));
+      // }
     }
   }
   else
