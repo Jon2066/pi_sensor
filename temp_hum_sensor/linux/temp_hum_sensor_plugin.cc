@@ -28,10 +28,14 @@ G_DEFINE_TYPE(TempHumSensorPlugin, temp_hum_sensor_plugin, g_object_get_type())
 static void DHT_setGPIO()
 {
   pinMode(TEMP_HUM_GPIO, OUTPUT);
-  digitalWrite(TEMP_HUM_GPIO, 0);
-  delay(20);
   digitalWrite(TEMP_HUM_GPIO, 1);
+  delay(1000);
+  digitalWrite(TEMP_HUM_GPIO, 0);
+  delay(25);
+  digitalWrite(TEMP_HUM_GPIO, 1);
+  delayMicroseconds(35);
   pinMode(TEMP_HUM_GPIO, INPUT);
+  pullUpDnControl(TEMP_HUM_GPIO, PUD_UP);
 }
 
 static int DHT_check()
@@ -50,20 +54,17 @@ static int DHT_check()
 static unsigned long DHT_readBit()
 {
   int k = 0;
+  while (digitalRead(TEMP_HUM_GPIO))
+  {
+    continue;
+  }
   while (!digitalRead(TEMP_HUM_GPIO))
   {
     continue;
   }
-  while (digitalRead(TEMP_HUM_GPIO))
-  {
-    k += 1;
-    if (k > 80)
-    {
-      return 1;
-    }
-    continue;
-  }
-  if(k >= 8){
+  //输出26-28us高电平 表示0，  输出70us 高电平表示1
+  delayMicroseconds(32);
+  if(digitalRead(TEMP_HUM_GPIO)){
     return 1;
   }
   return 0;
@@ -97,9 +98,6 @@ static void temp_hum_sensor_plugin_handle_method_call(
     }
     else
     {
-        pinMode(TEMP_HUM_GPIO, OUTPUT);
-        digitalWrite(TEMP_HUM_GPIO, 1);
-        delay(1000);
       g_autoptr(FlValue) result = fl_value_new_int(0);
 
       response = FL_METHOD_RESPONSE(fl_method_success_response_new(result));
@@ -114,11 +112,13 @@ static void temp_hum_sensor_plugin_handle_method_call(
       unsigned int check = 0;
       for (int i = 0; i < 32; i++)
       {
-        data += DHT_readBit() << (31 - i);
+        data *= 2; //左移1位
+        data += DHT_readBit();
       }
       for (int i = 0; i < 8; i++)
       {
-        check += DHT_readBit() << (7 - i);
+        check *= 2;//左移1位
+        check += DHT_readBit();
       }
       unsigned int dataCheck = ((data >> 24) & 0xff + (data >> 16) & 0xff + (data >> 8) & 0xff + data & 0xff) & 0xff;
       if (check == dataCheck)

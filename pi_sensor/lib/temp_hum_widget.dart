@@ -111,8 +111,8 @@ class _TempSensorWidget extends State<TempSensorWidget> {
           if (v == 0) {
             return;
           }
-          int hum = (v >> 16) & 0xff; //只看整数部分， (v >> 24) & 0xff小数部分忽略
-          int temp = v & 0xff;
+          int hum = (v >> 24) & 0xff; //只看整数部分， (v >> 16) & 0xff小数部分忽略
+          int temp = (v >> 8) & 0xff;
           tempString = "$temp °C";
           humString = "$hum %";
           setState(() {});
